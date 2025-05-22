@@ -132,7 +132,7 @@ BinarySearchTree::Iterator BinarySearchTree::Iterator::operator--() {
         }
         _node = parent;
     }
-    
+
     return *this;
 }
 
@@ -239,6 +239,7 @@ void BinarySearchTree::insert(const Key& key, const Value& value) {
         }
         Node* currentMax = _root;
         while(currentMax->right) currentMax = currentMax->right;
+
         if(parent != currentMax) {
             if (key < parent->keyValuePair.first) {
                 parent->left = new Node(key, value, parent);
@@ -249,9 +250,9 @@ void BinarySearchTree::insert(const Key& key, const Value& value) {
         }
         else {
             Node* temp = parent;
-            parent = new Node(key, value, parent->parent, nullptr, temp);
-            parent->right = temp;
+            parent = new Node(key, value, temp->parent, nullptr, temp);
             parent->parent->right = parent;
+            temp->parent = parent;
             temp->keyValuePair.first = key+1;
             _size++; 
         }
@@ -355,14 +356,14 @@ BinarySearchTree::equalRange(const Key& key) const {
 }
 
 BinarySearchTree::ConstIterator BinarySearchTree::min() const {
-    if (!_root) return cend();
+    if (!_root) return ConstIterator(nullptr);
     const Node* current = _root;
     while (current->left) current = current->left;
     return ConstIterator(current);
 }
 
 BinarySearchTree::ConstIterator BinarySearchTree::max() const {
-    if (!_root) return cend();
+    if (!_root) return ConstIterator(nullptr);
     const Node* current = _root;
     while (current->right) current = current->right;
     return ConstIterator(current->parent);
