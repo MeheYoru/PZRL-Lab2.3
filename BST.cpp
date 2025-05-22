@@ -132,6 +132,7 @@ BinarySearchTree::Iterator BinarySearchTree::Iterator::operator--() {
         }
         _node = parent;
     }
+    
     return *this;
 }
 
@@ -233,15 +234,27 @@ void BinarySearchTree::insert(const Key& key, const Value& value) {
             } else if (key > current->keyValuePair.first) {
                 current = current->right;
             } else {
-                current = current->right; // Handle duplicates
+                current = current->right;
             }
         }
-        if (key < parent->keyValuePair.first) {
-            parent->left = new Node(key, value, parent);
-        } else {
-            parent->right = new Node(key, value, parent);
+        Node* currentMax = _root;
+        while(currentMax->right) currentMax = currentMax->right;
+        if(parent != currentMax) {
+            if (key < parent->keyValuePair.first) {
+                parent->left = new Node(key, value, parent);
+            } else {
+                parent->right = new Node(key, value, parent);
+            }
+            _size++;
         }
-        _size++;
+        else {
+            Node* temp = parent;
+            parent = new Node(key, value, parent->parent, nullptr, temp);
+            parent->right = temp;
+            parent->parent->right = parent;
+            temp->keyValuePair.first = key+1;
+            _size++; 
+        }
     }
 }
 

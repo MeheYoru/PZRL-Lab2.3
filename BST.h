@@ -153,4 +153,5 @@ private:
     static size_t max_height_helper(const Node* node);
     size_t _size = 0; //!< размер дерева
     Node *_root = nullptr; //!< корневой узел дерева
+
 };
