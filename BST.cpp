@@ -21,8 +21,8 @@ BinarySearchTree::Node::Node(const Node& other)
 
 bool BinarySearchTree::Node::operator==(const Node& other) const {
     return keyValuePair == other.keyValuePair &&
-           ((!left && !other.left) || (left && other.left && *left == *other.left)) &&
-           ((!right && !other.right) || (right && other.right && *right == *other.right));
+            ((!left && !other.left) || (left && other.left && *left == *other.left)) &&
+            ((!right && !other.right) || (right && other.right && *right == *other.right));
 }
 
 void BinarySearchTree::Node::output_node_tree() const {
@@ -220,26 +220,28 @@ bool BinarySearchTree::ConstIterator::operator!=(const ConstIterator& other) con
 void BinarySearchTree::insert(const Key& key, const Value& value) {
     if (!_root) {
         _root = new Node(key, value);
+        Node* _endNode = new Node(key+1, 0, _root);
+        _root->right = _endNode;
         _size = 1;
     } else {
         Node* current = _root;
-        while (true) {
+        Node* parent = nullptr;
+        while (current) {
+            parent = current;
             if (key < current->keyValuePair.first) {
-                if (current->left) current = current->left;
-                else {
-                    current->left = new Node(key, value, current);
-                    _size++;
-                    break;
-                }
+                current = current->left;
+            } else if (key > current->keyValuePair.first) {
+                current = current->right;
             } else {
-                if (current->right) current = current->right;
-                else {
-                    current->right = new Node(key, value, current);
-                    _size++;
-                    break;
-                }
+                current = current->right; // Handle duplicates
             }
         }
+        if (key < parent->keyValuePair.first) {
+            parent->left = new Node(key, value, parent);
+        } else {
+            parent->right = new Node(key, value, parent);
+        }
+        _size++;
     }
 }
 
@@ -350,7 +352,7 @@ BinarySearchTree::ConstIterator BinarySearchTree::max() const {
     if (!_root) return cend();
     const Node* current = _root;
     while (current->right) current = current->right;
-    return ConstIterator(current);
+    return ConstIterator(current->parent);
 }
 BinarySearchTree::ConstIterator BinarySearchTree::min(const Key& key) const {
     ConstIterator it = cbegin();
@@ -396,7 +398,7 @@ BinarySearchTree::ConstIterator BinarySearchTree::cend() const {
     if (!_root) return cend();
     const Node* current = _root;
     while (current->right) current = current->right;
-    return ConstIterator(current)++;
+    return ConstIterator(current);
 }
 
 size_t BinarySearchTree::size() const { 
@@ -418,3 +420,4 @@ size_t BinarySearchTree::max_height_helper(const Node* node) {
     if (!node) return 0;
     return 1 + std::max(max_height_helper(node->left), max_height_helper(node->right));
 }
+
