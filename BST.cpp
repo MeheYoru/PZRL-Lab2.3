@@ -93,7 +93,8 @@ BinarySearchTree::~BinarySearchTree() {
         if (current->left) nodes.push(current->left);
         if (current->right) nodes.push(current->right);
         delete current;
-    }
+    }  
+    _size.~size_t();
 }
 
 BinarySearchTree::Iterator::Iterator(Node *node) : _node(node) {}
@@ -454,11 +455,13 @@ void BinarySearchTree::output_tree() {
         std::cout << std::endl;
     }
 }
+size_t BinarySearchTree::max_height() const {
+    if (!_root) return 0;
 
-size_t BinarySearchTree::max_height() const { return max_height_helper(_root); }
+    auto max_height_helper = [](const Node *node, auto &&self) {
+        if (!node) return 0;
+        return 1 + std::max(self(node->left, self), self(node->right, self));
+    };
 
-size_t BinarySearchTree::max_height_helper(const Node *node) {
-    if (!node) return 0;
-    return 1 + std::max(max_height_helper(node->left),
-                        max_height_helper(node->right));
+    return max_height_helper(_root, max_height_helper);
 }
