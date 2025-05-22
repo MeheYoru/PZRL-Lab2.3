@@ -329,8 +329,7 @@ BinarySearchTree::Iterator BinarySearchTree::find(const Key& key) {
     return end();
 }
 
-std::pair<BinarySearchTree::Iterator, BinarySearchTree::Iterator> 
-BinarySearchTree::equalRange(const Key& key) {
+std::pair<BinarySearchTree::Iterator, BinarySearchTree::Iterator> BinarySearchTree::equalRange(const Key& key) {
     Iterator lower = find(key);
     Iterator upper = lower;
     
@@ -341,8 +340,7 @@ BinarySearchTree::equalRange(const Key& key) {
     }
     return {lower, upper};
 }
-std::pair<BinarySearchTree::ConstIterator, BinarySearchTree::ConstIterator> 
-BinarySearchTree::equalRange(const Key& key) const {
+std::pair<BinarySearchTree::ConstIterator, BinarySearchTree::ConstIterator> BinarySearchTree::equalRange(const Key& key) const {
     ConstIterator lower = find(key);
     ConstIterator upper = lower;
     
@@ -369,20 +367,25 @@ BinarySearchTree::ConstIterator BinarySearchTree::max() const {
     return ConstIterator(current->parent);
 }
 BinarySearchTree::ConstIterator BinarySearchTree::min(const Key& key) const {
-    ConstIterator it = cbegin();
-    while (it != cend() && it->first < key) ++it;
-    return (it != cend() && it->first == key) ? it : cend();
+    ConstIterator it = find(key);
+    ConstIterator itMin = find(key);
+    it++;
+    while(it->first == key) {
+        itMin = (itMin->second < it->second?itMin:it);
+        it++;
+    }
+    return itMin;
 }
 
 BinarySearchTree::ConstIterator BinarySearchTree::max(const Key& key) const {
-    ConstIterator it = cbegin();
-    ConstIterator last = cend();
-    while (it != cend()) {
-        if (it->first == key) last = it;
-        if (it->first > key) break;
-        ++it;
+    ConstIterator it = find(key);
+    ConstIterator itMin = find(key);
+    it++;
+    while(it->first == key) {
+        itMin = (itMin->second > it->second?itMin:it);
+        it++;
     }
-    return last;
+    return itMin;
 }
 
 BinarySearchTree::Iterator BinarySearchTree::begin() {
